@@ -67,11 +67,11 @@ class PGD(Attack):
                 cost = -loss(outputs, target_labels)
             else:
                 cost = loss(outputs, labels)
-
+#add loss2
             # Update adversarial images
-            grad = torch.autograd.grad(
-                cost, adv_images, retain_graph=False, create_graph=False
-            )[0]
+            # grad = torch.autograd.grad(
+            #     cost, adv_images, retain_graph=False, create_graph=False
+            # )[0]
 
             adv_images = adv_images.detach() + self.alpha * grad.sign()
             delta = torch.clamp(adv_images - images, min=-self.eps, max=self.eps)
