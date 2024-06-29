@@ -70,7 +70,7 @@ class FGSM(Attack):
         
                     output2 = self.get_logits(new_data)
                     
-                    loss2 = torch.nn.functional.nll_loss(output2, labels)
+                    loss2 = loss(output2, labels)
                     # changed loss to cost
                     grad += (noise*(loss2-cost)/self.c)/self.ZO
             
