@@ -26,9 +26,10 @@ class FGSM(Attack):
 
     """
 
-    def __init__(self, model, eps=8 / 255):
+    def __init__(self, model, eps=8 / 255, k = 1):
         super().__init__("FGSM", model)
         self.eps = eps
+        self.k = k;
         self.supported_mode = ["default", "targeted"]
 
     def forward(self, images, labels):
@@ -53,9 +54,9 @@ class FGSM(Attack):
         else:
             cost = loss(outputs, labels)
 
-        c = 1e-3; k = 1
+        c = 1e-3;
         print("ha")
-        for i in range(k):
+        for i in range(self.k):
             noise = torch.randn_like(data)
             new_data = c*noise+data
 
