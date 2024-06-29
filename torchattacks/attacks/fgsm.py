@@ -53,7 +53,8 @@ class FGSM(Attack):
         else:
             cost = loss(outputs, labels)
 
-        c = 1e-3, k = 1
+        c = 1e-3; k = 1
+        print("ha")
         for i in range(k):
             noise = torch.randn_like(data)
             new_data = c*noise+data
