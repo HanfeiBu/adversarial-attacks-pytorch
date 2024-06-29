@@ -68,6 +68,16 @@ class PGD(Attack):
             else:
                 cost = loss(outputs, labels)
 #add loss2
+            c = 1e-3, k = 5
+            grad = torch.autograd.grad()[0]
+            for i in range(k):
+                noise = torch.randn_like(adv_images)
+                new_data = c*noise+adv_images
+
+                output2 = model(new_data)
+
+                loss2 = F.nll_loss(output2, target)
+                grad += (noise*(loss2-loss)/c)/k
             # Update adversarial images
             # grad = torch.autograd.grad(
             #     cost, adv_images, retain_graph=False, create_graph=False
