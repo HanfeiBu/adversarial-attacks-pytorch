@@ -26,10 +26,10 @@ class FGSM(Attack):
 
     """
 
-    def __init__(self, model, eps=8 / 255, k = 1):
+    def __init__(self, model, eps=8 / 255, ZO = 0):
         super().__init__("FGSM", model)
         self.eps = eps
-        self.k = k;
+        self.ZO = ZO;
         self.supported_mode = ["default", "targeted"]
 
     def forward(self, images, labels):
@@ -53,25 +53,27 @@ class FGSM(Attack):
             cost = -loss(outputs, target_labels)
         else:
             cost = loss(outputs, labels)
-    
-        c = 1e-3;
-        print("ha")
-        grad = 0
-        with torch.eval():
-            for i in range(self.k):
-                noise = torch.randn_like(images)
-                new_data = c*noise+images
-    
-                output2 = self.get_logits(new_data)
-                
-                loss2 = torch.nn.functional.nll_loss(output2, labels)
-                # changed loss to cost
-                grad += (noise*(loss2-cost)/c)/self.k
+
+        if self.ZO==0:
+            # Update adversarial images
+            grad = torch.autograd.grad(
+                cost, images, retain_graph=False, create_graph=False
+            )[0]
+        else:
+            c = 1e-3;
+            print("ha")
+            grad = 0
+            with torch.eval():
+                for i in range(self.ZO):
+                    noise = torch.randn_like(images)
+                    new_data = c*noise+images
         
-        # Update adversarial images, remove? test later
-        # grad = torch.autograd.grad(
-        #     cost, images, retain_graph=False, create_graph=False
-        # )[0]
+                    output2 = self.get_logits(new_data)
+                    
+                    loss2 = torch.nn.functional.nll_loss(output2, labels)
+                    # changed loss to cost
+                    grad += (noise*(loss2-cost)/c)/self.ZO
+            
 
         adv_images = images + self.eps * grad.sign()
         adv_images = torch.clamp(adv_images, min=0, max=1).detach()
