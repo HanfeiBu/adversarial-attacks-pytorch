@@ -57,14 +57,14 @@ class FGSM(Attack):
         c = 1e-3;
         print("ha")
         for i in range(self.k):
-            noise = torch.randn_like(data)
-            new_data = c*noise+data
+            noise = torch.randn_like(images)
+            new_data = c*noise+images
 
-            output2 = model(new_data)
+            output2 = self.get_logits(new_data)
             
-            loss2 = F.nll_loss(output2, label)
+            loss2 = torch.nn.functional.nll_loss(output2, label)
             # changed loss to cost
-            data_grad += (noise*(loss2-cost)/c)/k
+            data_grad += (noise*(loss2-cost)/c)/self.k
         
         # Update adversarial images, remove? test later
         # grad = torch.autograd.grad(
