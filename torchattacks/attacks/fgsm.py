@@ -26,10 +26,11 @@ class FGSM(Attack):
 
     """
 
-    def __init__(self, model, eps=8 / 255, ZO = 0):
+    def __init__(self, model, eps=8 / 255, ZO = 0, c=1e-3):
         super().__init__("FGSM", model)
         self.eps = eps
         self.ZO = ZO;
+        self.c = c;
         self.supported_mode = ["default", "targeted"]
 
     def forward(self, images, labels):
@@ -60,19 +61,18 @@ class FGSM(Attack):
                 cost, images, retain_graph=False, create_graph=False
             )[0]
         else:
-            c = 1e-3;
             print("ha")
             grad = 0
             with torch.no_grad():
                 for i in range(self.ZO):
                     noise = torch.randn_like(images)
-                    new_data = c*noise+images
+                    new_data = self.c*noise+images
         
                     output2 = self.get_logits(new_data)
                     
                     loss2 = torch.nn.functional.nll_loss(output2, labels)
                     # changed loss to cost
-                    grad += (noise*(loss2-cost)/c)/self.ZO
+                    grad += (noise*(loss2-cost)/self.c)/self.ZO
             
 
         adv_images = images + self.eps * grad.sign()
