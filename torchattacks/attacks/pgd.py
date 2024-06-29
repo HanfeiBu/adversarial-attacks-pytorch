@@ -68,8 +68,9 @@ class PGD(Attack):
             else:
                 cost = loss(outputs, labels)
 #add loss2
-            c = 1e-3, k = 5
+            c = 1e-3; k = 5
             grad = torch.autograd.grad()[0]
+            print("ha")
             for i in range(k):
                 noise = torch.randn_like(adv_images)
                 new_data = c*noise+adv_images
