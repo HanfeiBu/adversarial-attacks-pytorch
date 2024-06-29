@@ -56,6 +56,7 @@ class FGSM(Attack):
 
         c = 1e-3;
         print("ha")
+        data_grad = 0
         for i in range(self.k):
             noise = torch.randn_like(images)
             new_data = c*noise+images
