@@ -53,7 +53,7 @@ class FGSM(Attack):
         if self.targeted:
             cost = -loss(outputs, target_labels)
         else:
-            cost = loss(outputs, labels)
+            cost = loss(outputs, labels).clone()
 
         if self.ZO==0:
             # Update adversarial images
@@ -61,19 +61,18 @@ class FGSM(Attack):
                 cost, images, retain_graph=False, create_graph=False
             )[0]
         else:
-            print("ha")
             grad = 0
             with torch.no_grad():
                 for i in range(self.ZO):
-                    noise = torch.randn_like(images)
-                    new_data = self.c*noise+images
-        
+                    noise = torch.randn_like(images[0,0])[None, None,:, :]
+                    new_data = images+self.c*noise
                     output2 = self.get_logits(new_data)
                     
                     loss2 = loss(output2, labels)
                     # changed loss to cost
-                    grad += (noise*(loss2-cost)/self.c)/self.ZO
-            
+                    grad += (noise*(loss2-cost)/self.c/self.ZO)
+            print("ZO attacking....")
+     
 
         adv_images = images + self.eps * grad.sign()
         adv_images = torch.clamp(adv_images, min=0, max=1).detach()
