@@ -72,7 +72,7 @@ class PGD(Attack):
 #add loss2
             if self.k != 0:
                 grad = 0
-                print("ha")
+                # print("ha")
                 for i in range(self.k):
                     noise = torch.randn_like(adv_images)
                     new_data = self.c*noise+adv_images
