@@ -68,9 +68,9 @@ class FGSM(Attack):
                     new_data = images+self.c*noise
                     output2 = self.get_logits(new_data)
                     
-                    loss2 = loss(output2, labels)
+                    cost2 = loss(output2, labels)
                     # changed loss to cost
-                    grad += (noise*(loss2-cost)/self.c/self.ZO)
+                    grad += (noise*(cost2-cost)/self.c/self.ZO)
             print("ZO attacking....")
      
 
