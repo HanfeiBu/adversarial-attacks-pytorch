@@ -29,14 +29,14 @@ class PGD(Attack):
 
     """
 
-    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, random_start=True, k = 1, c = 1e-3):
+    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, random_start=True, ZO = 1, c = 1e-3):
         super().__init__("PGD", model)
         self.eps = eps
         self.alpha = alpha
         self.steps = steps
         self.random_start = random_start
         self.supported_mode = ["default", "targeted"]
-        self.k = k
+        self.k = ZO
         self.c = c
 
     def forward(self, images, labels):
