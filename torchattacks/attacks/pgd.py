@@ -79,8 +79,8 @@ class PGD(Attack):
     
                     output2 = self.get_logits(new_data)
     
-                    loss2 = torch.nn.functional.nll_loss(output2, labels)
-                    grad += (noise*(loss2-loss)/self.c)/self.k
+                    cost2 = loss(output2, labels)
+                    grad += (noise*(cost2-cost)/self.c)/self.k
             else:
                 # Update adversarial images
                 grad = torch.autograd.grad(
