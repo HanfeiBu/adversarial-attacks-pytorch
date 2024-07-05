@@ -29,7 +29,7 @@ class PGD(Attack):
 
     """
 
-    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, random_start=True, k = 1):
+    def __init__(self, model, eps=8 / 255, alpha=2 / 255, steps=10, random_start=True, k = 1, c = 1e-3):
         super().__init__("PGD", model)
         self.eps = eps
         self.alpha = alpha
@@ -37,6 +37,7 @@ class PGD(Attack):
         self.random_start = random_start
         self.supported_mode = ["default", "targeted"]
         self.k = k
+        self.c = c
 
     def forward(self, images, labels):
         r"""
@@ -69,17 +70,16 @@ class PGD(Attack):
             else:
                 cost = loss(outputs, labels)
 #add loss2
-            c = 1e-3
             grad = torch.autograd.grad()[0]
             print("ha")
             for i in range(self.k):
                 noise = torch.randn_like(adv_images)
-                new_data = c*noise+adv_images
+                new_data = self.c*noise+adv_images
 
                 output2 = self.get_logits(new_data)
 
                 loss2 = torch.nn.functional.nll_loss(output2, labels)
-                grad += (noise*(loss2-loss)/c)/self.k
+                grad += (noise*(loss2-loss)/self.c)/self.k
             # Update adversarial images
             # grad = torch.autograd.grad(
             #     cost, adv_images, retain_graph=False, create_graph=False
