@@ -70,20 +70,22 @@ class PGD(Attack):
             else:
                 cost = loss(outputs, labels)
 #add loss2
-            grad = torch.autograd.grad()[0]
-            print("ha")
-            for i in range(self.k):
-                noise = torch.randn_like(adv_images)
-                new_data = self.c*noise+adv_images
-
-                output2 = self.get_logits(new_data)
-
-                loss2 = torch.nn.functional.nll_loss(output2, labels)
-                grad += (noise*(loss2-loss)/self.c)/self.k
-            # Update adversarial images
-            # grad = torch.autograd.grad(
-            #     cost, adv_images, retain_graph=False, create_graph=False
-            # )[0]
+            if self.k != 0:
+                grad = torch.autograd.grad()[0]
+                print("ha")
+                for i in range(self.k):
+                    noise = torch.randn_like(adv_images)
+                    new_data = self.c*noise+adv_images
+    
+                    output2 = self.get_logits(new_data)
+    
+                    loss2 = torch.nn.functional.nll_loss(output2, labels)
+                    grad += (noise*(loss2-loss)/self.c)/self.k
+            else:
+                # Update adversarial images
+                grad = torch.autograd.grad(
+                    cost, adv_images, retain_graph=False, create_graph=False
+                )[0]
 
             adv_images = adv_images.detach() + self.alpha * grad.sign()
             delta = torch.clamp(adv_images - images, min=-self.eps, max=self.eps)
