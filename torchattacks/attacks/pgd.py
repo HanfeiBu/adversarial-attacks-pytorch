@@ -74,7 +74,7 @@ class PGD(Attack):
                 grad = 0
                 with torch.no_grad():
                     for i in range(self.k):
-                        noise = torch.randn_like(adv_images)
+                        noise = torch.randn_like(images[0,0])[None, None,:, :]
                         new_data = self.c*noise+adv_images
         
                         output2 = self.get_logits(new_data)
