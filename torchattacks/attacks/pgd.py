@@ -72,15 +72,15 @@ class PGD(Attack):
 #add loss2
             if self.k != 0:
                 grad = 0
-                # print("ha")
-                for i in range(self.k):
-                    noise = torch.randn_like(adv_images)
-                    new_data = self.c*noise+adv_images
-    
-                    output2 = self.get_logits(new_data)
-    
-                    cost2 = loss(output2, labels)
-                    grad += (noise*(cost2-cost)/self.c)/self.k
+                with torch.no_grad():
+                    for i in range(self.k):
+                        noise = torch.randn_like(adv_images)
+                        new_data = self.c*noise+adv_images
+        
+                        output2 = self.get_logits(new_data)
+        
+                        cost2 = loss(output2, labels)
+                        grad += (noise*(cost2-cost)/self.c)/self.k
             else:
                 # Update adversarial images
                 grad = torch.autograd.grad(
