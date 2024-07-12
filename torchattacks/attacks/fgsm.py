@@ -71,7 +71,7 @@ class FGSM(Attack):
                     cost2 = loss(output2, labels)
                     # changed loss to cost
                     grad += (noise*(cost2-cost)/self.c/self.ZO)
-            print("ZO attacking....")
+            # print("ZO attacking....")
      
 
         adv_images = images + self.eps * grad.sign()
